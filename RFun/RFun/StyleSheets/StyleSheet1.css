@@ -1,0 +1,68 @@
+﻿#main {
+    padding-top: 60px;
+}
+
+.jumbotron {
+    background-color: white;
+    margin-top: 60px;
+}
+
+#push {
+    height: 60px;
+}
+
+.row {
+    margin-left: 0px;
+}
+
+#results ul {
+    padding-left: 0px;
+}
+
+#progress {
+    display: none;
+    position: fixed;
+    top: 40px;
+}
+
+#args-table {
+    width: 80%;
+}
+
+#search-form {
+    margin-bottom: 20px;
+    margin-top: 30px;
+    width: 50%;
+}
+
+footer div {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+#signin {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Sticky footer styles http://getbootstrap.com/examples/sticky-footer-navbar/ */
+
+html,
+body {
+    height: 100%;
+}
+
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -60px;
+    padding: 0 0 60px;
+}
+
+#footer {
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+/*------------------------------------------*/
