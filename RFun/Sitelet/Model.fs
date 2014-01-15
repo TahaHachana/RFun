@@ -4,10 +4,6 @@ type PageId = int
 
 type Action =
     | About
-    | [<CompiledName("function")>] Function of PageId
-//    | Admin
     | Error
+    | [<CompiledName("function")>] Function of PageId
     | Home
-//    | Login of Action option
-//    | Logout
-//    | [<CompiledName("sub")>] Sub of PageId

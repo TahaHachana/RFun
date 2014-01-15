@@ -137,11 +137,6 @@ let argInfo (tds:HtmlAgilityPack.HtmlNode*HtmlAgilityPack.HtmlNode) =
     names.InnerText.Split ','
     |> Array.map (fun x -> Arg.New (x.Trim()) desc')
 
-//let htmlDoc =
-//    Http.GetString "http://stat.ethz.ch/R-manual/R-devel/library/class/html/somgrid.html"
-//    |> Option.get
-//    |> Html.load
-
 let scrapeArgs htmlDoc =
     Node.selectList htmlDoc "/html/body/table[2]/tr/td"
     |> Option.get
@@ -174,25 +169,30 @@ let collectFunctions html reference =
     |> Array.iter (fun f ->
         updateArgs f args
         |> functionsBag.Add)
-//        let fArgs = f.Args
-//        let args' =
-//            Array.filter
-//                (fun arg ->
-//                    Array.exists
-//                        (fun (fArg:Arg) -> fArg.Name = arg.Name)
-//                        fArgs)
-//                args
-//        functionsBag.Add {f with Args = args'})
+
+let printer =
+    MailboxProcessor<string>.Start(fun inbox ->
+        let rec loop() =
+            async {
+                let! msg = inbox.Receive()
+                printfn "%s" msg
+                return! loop()
+            }
+        loop())
 
 let scrapeFunctions (url:string) =
     async {
-        let! html = Http.AsyncGetString url
-        match html with
-        | None -> ()
-        | Some value -> 
-            match isFunction value with
-            | false -> ()
-            | true -> collectFunctions value url
+        let msg = sprintf "Crawling: %s" url
+        printer.Post msg
+        try
+            let! html = Http.AsyncGetString url
+            match html with
+            | None -> ()
+            | Some value -> 
+                match isFunction value with
+                | false -> ()
+                | true -> collectFunctions value url
+        with _ -> ()
     }
 
 let h =
@@ -200,37 +200,23 @@ let h =
         printfn "Done"
     }
 
-//let h =
-//    {
-//        let asyncs = functionsBag.ToArray().[..9] |> Array.mapi (fun idx f ->
-//            let idx' = string <| idx + 1
-//            let name, package, description = f.Name, f.Package, f.Description
-//            Indexden.addDoc idx' name package description)
-//        Throttler.throttle asyncs 5 h
-//
-//    }
-
-//let f = Function.New "name" [|{Name= "arg"; Description = "desc"}|] "desc" "ref" "pack"
-
 let indexFunction idx (f:Function) =
     async {
+        let name = f.Name
+        let msg = sprintf "Indexing: %s" name
+        printer.Post msg
         let idx' = idx + 1
-        let name, package, description, usage = f.Name, f.Package, f.Description, f.Usage
+        let package, description, usage = f.Package, f.Description, f.Usage
         Indexden.addDoc (string idx') name package description
         let args' = f.Args |> Array.map (fun arg -> Mongo.Arg.New arg.Name arg.Description)
         let f' = Mongo.MongoFunction.New idx' name args' description f.Reference package usage
         Mongo.functions.Insert f' |> ignore
+        ()
     }
     
 let g = 
     async {
-        let asyncs = functionsBag.ToArray() |> Array.mapi indexFunction //(fun idx f ->
-//            let idx' = idx + 1
-//            let name, package, description = f.Name, f.Package, f.Description
-//            Indexden.addDoc (string idx') name package description
-//            let args' = f.Args |> Array.map (fun arg -> Mongo.Arg.New arg.Name arg.Description)
-//            let f' = Mongo.MongoFunction.New idx name args' description f.Reference package
-//            Mongo.functions.Insert f' |> ignore)
+        let asyncs = functionsBag.ToArray() |> Array.mapi indexFunction
         Throttler.throttle asyncs 5 h
     }
 
@@ -240,14 +226,6 @@ let f =
         Throttler.throttle asyncs 5 g        
     }
 
-let asyncs = Array.map functionsUrls packagesUrls.[5..10]
+let asyncs = Array.map functionsUrls packagesUrls
 
 Throttler.throttle asyncs 5 f
-
-
-
-//scrapeFunctions "http://stat.ethz.ch/R-manual/R-devel/library/class/html/somgrid.html"
-//|> Async.RunSynchronously
-//
-//
-//functionsBag.ToArray() |> Array.filter (fun x -> x.Name = "plot")

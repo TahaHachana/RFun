@@ -84,7 +84,65 @@
        });
       }),f(results));
       ul=Operators.add(Default.UL(List.ofArray([Default.Attr().Class("col-lg-8")])),lis);
-      return jQuery("#results").empty().append(ul.Body);
+      jQuery("#results").empty().append(ul.Body);
+      return window.scrollTo(0,0);
+     },
+     handleClick:function(q)
+     {
+      var arg00,clo1,t;
+      arg00=Concurrency.Delay((clo1=function()
+      {
+       var x,f;
+       jQuery("#progress").show();
+       jQuery("#results").empty();
+       jQuery("#pagination").empty();
+       x=Client.search(q,1);
+       f=Runtime.Tupled(function(_arg1)
+       {
+        var matches,results,alert,x1,f1,patternInput,f2,form;
+        matches=_arg1[0];
+        results=_arg1[1];
+        if(matches===0)
+         {
+          jQuery("#progress").hide();
+          alert=Default.Div(List.ofArray([Default.Attr().Class("alert alert-danger col-lg-offset-3 col-lg-6"),Default.Text("Your search did not match any functions.")]));
+          x1=jQuery("#results").append(alert.Body);
+          f1=function(value)
+          {
+           value;
+          };
+          f1(x1);
+          return Concurrency.Return(null);
+         }
+        else
+         {
+          if(matches===1)
+           {
+            patternInput=results[0];
+            f2=patternInput[0];
+            window.location.assign("/function/"+f2);
+            return Concurrency.Return(null);
+           }
+          else
+           {
+            jQuery("#progress").hide();
+            form=Client.searchForm();
+            jQuery(".jumbotron").replaceWith(form.Body);
+            jQuery("#query-2").val(q);
+            Client.displayResults(results);
+            Client.paginationDiv(matches,1,q);
+            jQuery(".page").first().addClass("active");
+            Client.bindClick();
+            return Concurrency.Return(null);
+           }
+         }
+       });
+       return Concurrency.Bind(x,f);
+      },clo1));
+      t={
+       $:0
+      };
+      return Concurrency.Start(arg00);
      },
      link:function(href,text)
      {
@@ -117,73 +175,16 @@
       {
        return function()
        {
-        var q,_this5,x2,f2,f6;
+        var q,_this5;
         q=(_this5=inp.get_Value(),Strings.Trim(_this5));
-        x2=(f2=function()
-        {
-         var x3,f3;
-         jQuery("#progress").show();
-         jQuery("#results").empty();
-         jQuery("#pagination").empty();
-         x3=Client.search(q,1);
-         f3=Runtime.Tupled(function(_arg1)
-         {
-          var matches,results,alert,x4,f4,patternInput,f5,form;
-          matches=_arg1[0];
-          results=_arg1[1];
-          if(matches===0)
-           {
-            jQuery("#progress").hide();
-            alert=Default.Div(List.ofArray([Default.Attr().Class("alert alert-danger col-lg-offset-3 col-lg-6"),Default.Text("Your search did not match any functions.")]));
-            x4=jQuery("#results").append(alert.Body);
-            f4=function(value)
-            {
-             value;
-            };
-            f4(x4);
-            return Concurrency.Return(null);
-           }
-          else
-           {
-            if(matches===1)
-             {
-              patternInput=results[0];
-              f5=patternInput[0];
-              window.location.assign("/function/"+f5);
-              return Concurrency.Return(null);
-             }
-            else
-             {
-              jQuery("#progress").hide();
-              form=Client.searchForm();
-              jQuery(".jumbotron").replaceWith(form.Body);
-              jQuery("#query-2").val(q);
-              Client.displayResults(results);
-              Client.paginationDiv(matches,1,q);
-              jQuery(".page").first().addClass("active");
-              Client.bindClick();
-              return Concurrency.Return(null);
-             }
-           }
-         });
-         return Concurrency.Bind(x3,f3);
-        },Concurrency.Delay(f2));
-        f6=function(arg002)
-        {
-         var t;
-         t={
-          $:0
-         };
-         return Concurrency.Start(arg002);
-        };
-        return f6(x2);
+        return Client.handleClick(q);
        };
       },function(arg10)
       {
        return EventsPervasives.Events().OnClick(arg001,arg10);
       }),(f1(x1),x1)))]))])),Default.Script(List.ofArray([(_this6=Default.Attr(),_this6.NewAttr("src","/Scripts/AutoComplete.js"))]))]))]));
      },
-     pageLi:function(x,pageId,queryStr)
+     pageLi:function(x,queryStr)
      {
       var xStr,li;
       xStr=Global.String(x);
@@ -202,7 +203,7 @@
       },false);
       return li;
      },
-     pagesUl:function(pageId,queryStr,pages)
+     pagesUl:function(queryStr,pages)
      {
       return Operators.add(Default.UL(List.ofArray([Default.Attr().Class("pagination")])),Seq.toList(Seq.delay(function()
       {
@@ -210,7 +211,7 @@
        {
         return function(x1)
         {
-         return Client.pageLi(x1,pageId,queryStr);
+         return Client.pageLi(x1,queryStr);
         }(x);
        });
       })));
@@ -223,7 +224,7 @@
       _pages_=(source=Seq.truncate(10,pages),Seq.toArray(source));
       div=length===1?Default.Div(Runtime.New(T,{
        $:0
-      })):Operators.add(Default.Div(List.ofArray([Default.Attr().Class("row")])),List.ofArray([Client.pagesUl(pageId,queryStr,_pages_,length)]));
+      })):Operators.add(Default.Div(List.ofArray([Default.Attr().Class("row")])),List.ofArray([Client.pagesUl(queryStr,_pages_)]));
       value2=jQuery("#pagination").append(div.Body);
       value2;
      },

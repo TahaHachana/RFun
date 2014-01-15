@@ -3,23 +3,6 @@
 open System
 open IntelliFactory.Html
 open IntelliFactory.WebSharper.Sitelets
-//open Model
-
-//let random url = url + "?d=" + Uri.EscapeUriString(DateTime.Now.ToString())
-
-//let loginInfo (ctx: Context<_>) =
-//    let userOption = UserSession.GetLoggedInUser()
-//    match userOption with
-//        | Some user ->
-//            A [
-//                Class "navbar-right btn btn-default navbar-btn"
-//                HRef (random <| ctx.Link Action.Logout)
-//            ] -< [Text <| "Sign out (" + user + ")"]
-//        | None ->
-//            A [
-//                Class "navbar-right btn btn-default navbar-btn"
-//                HRef ("/login")
-//            ] -< [Text "Sign in"]
 
 let navToggle =
     Button [
@@ -54,7 +37,6 @@ let navDiv activeLi ctx =
             li activeLi "/" "Home"
             li activeLi "/about" "About"
         ]
-//        loginInfo ctx
     ]
 
 let navElt activeLi ctx : Content.HtmlElement =
