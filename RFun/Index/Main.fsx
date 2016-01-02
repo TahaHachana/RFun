@@ -56,7 +56,7 @@ let library =
 let packageUrlRegex = Regex.compile "href=\"([^/]+/)\""
 let functionUrlRegex = Regex.compile "href=\"(.+?\.html)\""
 let argumentsRegex = Regex.compile "<h3>Arguments</h3>"
-let functionRegex = Regex.compile "([^ ]+)\(((?:[^()]|(?<open>\()|(?<-open>\)))+(?(open)(?!)))\)"
+let functionRegex = Regex.compile "([^ ]+?)\(((?:[^()]|(?<open>\()|(?<-open>\)))+(?(open)(?!)))\)"
 let descRegex = Regex.compile "(?s)<h3>Description</h3>(.+?)<h3>Usage</h3>"
 let packageRegex = Regex.compile "library/([^/]+)/"
 
@@ -164,6 +164,8 @@ let collectFunctions html reference =
         |> Seq.cast<Match>
         |> Seq.toArray
         |> Array.map (fun x -> parseFunction x description reference)
+        |> Seq.distinct
+        |> Seq.toArray
     let args = scrapeArgs htmlDoc
     functions
     |> Array.iter (fun f ->
@@ -229,3 +231,4 @@ let f =
 let asyncs = Array.map functionsUrls packagesUrls
 
 Throttler.throttle asyncs 5 f
+

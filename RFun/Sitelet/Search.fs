@@ -87,7 +87,6 @@ module private Client =
             ), false)
         li
 
-
     let pagesUl queryStr pages =
         UL [Attr.Class "pagination"] -< [
             yield! Array.map (fun x -> pageLi x queryStr) pages
